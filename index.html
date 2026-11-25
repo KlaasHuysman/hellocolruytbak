@@ -80,7 +80,7 @@
   header.hero{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:2rem;align-items:center}
   .hero-bak{position:relative;display:flex;flex-direction:column;align-items:center}
   .bubble{position:relative;width:100%;min-height:58px;background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:16px;
-    padding:.6rem .9rem;font-weight:600;font-size:.95rem;line-height:1.35;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;box-shadow:3px 3px 0 rgba(0,0,0,.12)}
+    padding:.6rem .9rem;font-weight:600;font-size:.95rem;line-height:1.35;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;box-shadow:3px 3px 0 rgba(0,0,0,.12);pointer-events:none}
   .bubble.on{opacity:1;transform:none}
   .bubble::after{content:"";position:absolute;bottom:-11px;left:55%;width:18px;height:18px;background:#fff;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
   #bak{width:230px;height:auto;margin-top:.6rem;cursor:pointer;touch-action:manipulation}
@@ -98,10 +98,19 @@
   [data-state=zwaaien] #armR .up{display:inline!important}
   [data-state=zwaaien] #armR .down{display:none}
   @media (prefers-reduced-motion:reduce){#bak *{animation:none!important;transition:none!important}}
+  /* zwevende Bakske zodra de kop uit beeld is */
+  .hero-bak-plek{min-height:330px}
+  .hero-bak.zweef{position:fixed;right:18px;bottom:14px;width:260px;z-index:20;align-items:flex-end}
+  .hero-bak.zweef #bak{width:120px;margin-right:6px}
+  .hero-bak.zweef .bubble{font-size:.88rem}
+  .hero-bak.zweef .bubble::after{left:auto;right:48px}
 
   @media (max-width:860px){
     header.hero{grid-template-columns:1fr}
     .hero-bak{max-width:300px;margin:0 auto}
+    .hero-bak.zweef{width:200px;right:10px;bottom:10px}
+    .hero-bak.zweef #bak{width:90px}
+    .hero-bak.zweef .bubble{font-size:.82rem;padding:.5rem .7rem}
     .wrap{grid-template-columns:1fr}
     nav.toc{position:static;padding-top:0}
     nav.toc ol{columns:2}
@@ -111,7 +120,7 @@
   }
   @media print{
     body{background:#fff;font-size:11pt}
-    nav.toc,.actions,.toast,details,.hero-bak{display:none}
+    nav.toc,.actions,.toast,details,.hero-bak,.hero-bak-plek{display:none}
     header.hero{display:block}
     .wrap{display:block;max-width:none;padding:0}
     section{border:none;padding:0;margin:0 0 1.2rem;break-inside:auto}
@@ -140,6 +149,7 @@
     <div><b>± €350</b>budget per 2 weken</div>
   </div>
   </div>
+  <div class="hero-bak-plek" id="plek">
   <div class="hero-bak" id="stage" data-state="idle">
     <div class="bubble" id="bubble" aria-live="polite"><span id="say"></span></div>
 <svg id="bak" viewBox="0 0 330 330" role="img" aria-label="Bakske, een blauwe plooibak met gezicht">
@@ -210,6 +220,7 @@
     </g>
   </g></g>
 </svg>
+  </div>
   </div>
 </header>
 
@@ -653,6 +664,8 @@ Rapporteer de gevonden fouten, verbeter ze en laat de verbeteringen opnieuw cont
     dx=dx/d*6*k; dy=dy/d*7*k;
     pupillen.forEach(p => p.setAttribute('transform', `translate(${dx.toFixed(1)} ${dy.toFixed(1)})`));
   });
+  new IntersectionObserver(([en]) => stage.classList.toggle('zweef', !en.isIntersecting), {threshold:0})
+    .observe(document.querySelector('header.hero'));
   setTimeout(() => speel('zwaaien', 'Hallo! Ik ben Bakske. Klik in de inhoud en ik vertel je kort wat er in elke sectie staat.'), 500);
 </script>
 </body>
